@@ -1,0 +1,1015 @@
+
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50 text-slate-800">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atenea: El Viaje del Caballo Soñador</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif'],
+          },
+          colors: {
+            board: {
+              light: '#f0d9b5',
+              dark: '#b58863',
+            }
+          },
+          animation: {
+            'bounce-short': 'bounce 0.5s ease-in-out 1',
+            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+    }
+    .square-transition {
+      transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease, filter 0.2s ease;
+    }
+    .square-transition:active {
+      transform: scale(0.95);
+    }
+    /* Custom Scrollbar for sidebars */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+
+<body class="h-full flex flex-col bg-slate-50 text-slate-800 overflow-x-hidden selection:bg-amber-300 selection:text-slate-900 font-sans">
+
+  <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white font-bold shadow-sm shadow-amber-500/20 text-xl">
+          <i class="fa-solid font-bold fa-chess-knight"></i>
+        </div>
+        <div>
+          <h1 class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-800 flex items-center gap-2">
+            Atenea <span class="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold border border-amber-200">Ajedrez Pedagógico</span>
+          </h1>
+          <p class="text-xs text-slate-500 font-medium hidden xs:block">El Salto del Caballo Soñador</p>
+        </div>
+      </div>
+
+      <!-- Controls & Master Sound -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="btn-fullscreen" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-2 text-xs font-semibold border border-slate-200 shadow-sm" title="Pantalla Completa">
+          <i class="fa-solid fa-expand icon-fullscreen"></i>
+        </button>
+
+        <button id="btn-sound-toggle" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-2 text-xs font-semibold border border-slate-200 shadow-sm" title="Activar/Desactivar Sonido">
+          <i id="icon-sound" class="fa-solid fa-volume-high text-amber-500"></i>
+        </button>
+
+        <button id="btn-tts-toggle" class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-2 text-xs font-semibold border border-slate-200 shadow-sm" title="Activar/Desactivar Voz de Atenea">
+          <i id="icon-tts" class="fa-solid fa-comment-dots text-emerald-600"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-6 flex flex-col gap-6">
+
+    <!-- ==================== VIEW 1: HOME / LEVEL SELECTOR ==================== -->
+    <section id="view-home" class="flex flex-col gap-6 animate-fade-in">
+      
+      <!-- Welcome Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-50 via-white to-orange-50 border border-amber-200 p-6 sm:p-8 shadow-sm">
+        <div class="absolute -right-6 -bottom-12 opacity-10 text-9xl text-amber-500 pointer-events-none">
+          <i class="fa-solid fa-chess-knight"></i>
+        </div>
+        
+        <div class="max-w-2xl relative z-10 flex flex-col gap-3">
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 w-fit">
+            <i class="fa-solid fa-graduation-cap"></i> Aventura Pedagógica
+          </span>
+          <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-slate-800 tracking-tight">
+            ¡Hola, explorador/a del tablero! 🦄♟️
+          </h2>
+          <p class="text-slate-600 text-sm sm:text-base leading-relaxed font-medium">
+            Soy la profesora <strong class="text-amber-600 font-bold">Atenea</strong>. Hoy vamos a desarrollar nuestro pensamiento computacional investigando el movimiento más mágico del ajedrez: <span class="text-amber-600 font-bold underline decoration-amber-400">El Salto en "L" del Caballo</span>.
+            Tu misión es realizar la mayor cantidad de <strong class="text-slate-800">movimientos</strong> posibles sin repetir ninguna casilla.
+          </p>
+          <button id="btn-play-intro" class="mt-2 w-fit px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-sm shadow-md shadow-amber-400/20 transition flex items-center gap-2 border border-amber-500">
+            <i class="fa-solid fa-volume-high"></i> Escuchar Bienvenida de Atenea
+          </button>
+        </div>
+      </div>
+
+      <!-- Level Cards Grid -->
+      <div>
+        <h3 class="font-display font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-map-location-dot text-amber-500"></i> Selecciona tu Reto del Caballo:
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+          <!-- Card 1: 4x4 Grid -->
+          <div id="card-level-4" class="group relative rounded-2xl bg-white border-2 border-amber-400 hover:border-amber-500 p-5 transition flex flex-col justify-between shadow-sm hover:shadow-md cursor-pointer">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                  Nivel 1 • Entrenamiento
+                </span>
+                <span id="badge-attempts-4" class="text-xs bg-slate-100 text-slate-600 font-bold px-2.5 py-1 rounded-lg border border-slate-200">
+                  Intentos: 0
+                </span>
+              </div>
+              <h4 class="font-display font-bold text-xl text-slate-800 group-hover:text-amber-600 transition flex items-center gap-2">
+                <i class="fa-solid fa-chess-board text-amber-500"></i> Tablero 4 x 4
+              </h4>
+              <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                ¿Cuántos movimientos eres capaz de sumar antes de quedarte sin casillas? ¡Un desafío para poner a prueba tu mente!
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div class="text-xs text-slate-500 font-medium">
+                Mejor Récord: <span id="record-4x4" class="font-bold text-amber-600">0 / 16</span>
+              </div>
+              <button class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-bold text-xs shadow-sm transition flex items-center gap-1.5">
+                ¡Jugar 4x4! <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: 6x6 Grid -->
+          <div id="card-level-6" class="group relative rounded-2xl bg-slate-50 border border-slate-200 p-5 transition flex flex-col justify-between opacity-70">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  Nivel 2 • Supercaballo
+                </span>
+                <span id="lock-icon-6" class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                  <i class="fa-solid fa-lock"></i> Bloqueado
+                </span>
+              </div>
+              <h4 class="font-display font-bold text-xl text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-chess-board text-indigo-400"></i> Tablero 6 x 6
+              </h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                Se desbloquea al descubrir el misterio del 4x4. Aquí sí podrás recorrer las 36 casillas.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div class="text-xs text-slate-400 font-medium">
+                Mejor Récord: <span id="record-6x6" class="font-bold text-indigo-400">0 / 36</span>
+              </div>
+              <button id="btn-play-6" disabled class="px-4 py-2 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs cursor-not-allowed">
+                Bloqueado
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: 8x8 Grid -->
+          <div id="card-level-8" class="group relative rounded-2xl bg-slate-50 border border-slate-200 p-5 transition flex flex-col justify-between opacity-70">
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Nivel 3 • Gran Maestra/o
+                </span>
+                <span id="lock-icon-8" class="text-xs text-amber-700 font-bold bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                  <i class="fa-solid fa-lock"></i> Bloqueado
+                </span>
+              </div>
+              <h4 class="font-display font-bold text-xl text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-chess-board text-emerald-400"></i> Tablero 8 x 8 Real
+              </h4>
+              <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                Se desbloquea tras superar el 6x6. El tablero de ajedrez oficial de 64 casillas.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div class="text-xs text-slate-400 font-medium">
+                Mejor Récord: <span id="record-8x8" class="font-bold text-emerald-400">0 / 64</span>
+              </div>
+              <button id="btn-play-8" disabled class="px-4 py-2 rounded-xl bg-slate-200 text-slate-500 font-bold text-xs cursor-not-allowed">
+                Bloqueado
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: GAMEPLAY BOARD ==================== -->
+    <section id="view-game" class="hidden flex-col gap-6 animate-fade-in">
+      
+      <!-- Top Status & Stats Bar -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button id="btn-back-menu" class="p-2.5 sm:p-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 transition text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-amber-300/40 border border-amber-300 ring-2 ring-amber-300/50">
+            <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Volver a</span> Menú
+          </button>
+          <div>
+            <h3 id="game-title" class="font-display font-extrabold text-base sm:text-lg text-slate-800 leading-tight">
+              Tablero 4x4
+            </h3>
+            <p id="game-subtitle" class="text-[11px] sm:text-xs text-slate-500 font-medium hidden xs:block">Haz clic en una casilla para colocar el Caballo</p>
+          </div>
+        </div>
+
+        <!-- Live Score & Control Actions -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200 mr-2">
+            <span class="text-[10px] text-amber-700 uppercase font-bold tracking-wider">Mvs:</span>
+            <span id="score-current" class="font-display font-extrabold text-base sm:text-lg text-amber-600">0</span>
+            <span class="text-slate-300 text-xs">/</span>
+            <span id="score-max" class="font-display font-extrabold text-xs sm:text-sm text-slate-600">16</span>
+          </div>
+
+          <button id="btn-toggle-hints" class="p-2 sm:p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition flex items-center gap-1.5 text-xs font-bold border border-emerald-300 shadow-sm" title="Activar/Ocultar puntos verdes de pistas">
+            <i id="icon-hints" class="fa-solid fa-eye text-emerald-600"></i>
+            <span id="text-hints" class="hidden sm:inline">Ayudas: SÍ</span>
+          </button>
+
+          <button id="btn-undo" title="Deshacer último movimiento" class="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200 flex items-center gap-1 text-xs font-bold shadow-sm">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span class="hidden md:inline">Deshacer</span>
+          </button>
+          <button id="btn-restart" title="Reiniciar solo el tablero actual" class="p-2 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition border border-slate-200 flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-arrow-rotate-right"></i>
+            <span class="hidden sm:inline">Reiniciar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Center Gameplay Layout: Board + Teacher Advice Side Panel -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left / Center: Interactive Chessboard Canvas -->
+        <div class="lg:col-span-7 flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 shadow-sm relative overflow-hidden">
+          
+          <div id="stuck-banner" class="hidden w-full mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold text-center flex items-center justify-center gap-2 animate-bounce-short">
+            <i class="fa-solid fa-circle-exclamation text-rose-500 text-base"></i>
+            <span>¡Sin movimientos válidos! Te has quedado sin casillas libres a tiro de caballo.</span>
+          </div>
+
+          <!-- Board Canvas Container -->
+          <div id="board-container" class="relative w-full max-w-[460px] aspect-square rounded-xl shadow-xl overflow-hidden border-4 border-amber-800 bg-amber-50">
+            <!-- Dynamic Grid injected via JS -->
+          </div>
+
+          <!-- Legend -->
+          <div class="flex flex-wrap items-center justify-center gap-3 mt-5 text-[11px] sm:text-xs text-slate-600 font-bold">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 shadow-sm border border-amber-500"></span> Caballo</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-400 shadow-sm border border-emerald-500"></span> Salto Válido</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-700 shadow-sm"></span> Movimientos realizados</span>
+          </div>
+        </div>
+
+        <!-- Right Side: Atenea's Pedagogical Feedback Box -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          
+          <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 shadow-sm flex flex-col gap-4 relative">
+            <div class="flex items-center gap-3 border-b border-amber-200/60 pb-3">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-300 flex items-center justify-center text-slate-800 text-2xl shadow-sm shadow-amber-300/40 font-bold">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+              <div>
+                <h4 class="font-display font-bold text-slate-800 text-base">Atenea te guía</h4>
+                <p class="text-xs text-amber-700 font-bold">Consejos Pedagógicos</p>
+              </div>
+              <button id="btn-repeat-speech" title="Repetir mensaje en voz alta" class="ml-auto text-amber-600 hover:text-amber-700 hover:bg-amber-100 transition p-2.5 text-sm bg-white rounded-xl border border-amber-200 shadow-sm">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+
+            <!-- Dynamic Advice Text -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200 text-sm text-slate-700 leading-relaxed min-h-[100px] flex items-center font-medium shadow-sm" id="atenea-advice-text">
+              ¡Haz clic en cualquier casilla del tablero para elegir el punto de partida de tu caballo!
+            </div>
+
+            <!-- Attempt Counter Alert for 4x4 -->
+            <div id="attempts-info-box" class="hidden bg-white border border-amber-200 rounded-xl p-3 text-xs text-slate-700 flex items-center justify-between font-medium">
+              <span>Intentos en 4x4: <strong id="attempt-count-val" class="font-bold text-amber-600">0</strong> / 5 para el gran enigma</span>
+              <i class="fa-solid fa-puzzle-piece text-amber-500"></i>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-600 flex flex-col gap-2 font-medium">
+            <span class="font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-compass text-indigo-500"></i> Memoria Visual del Caballo:
+            </span>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Paso 1: Avanza 2 casillas horizontales o verticales.</li>
+              <li>Paso 2: Gira 1 casilla a la izquierda o derecha.</li>
+              <li>El número grabado muestra los <strong class="text-slate-800">movimientos realizados</strong>.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: CINEMATIC MODAL ==================== -->
+    <section id="view-cinematic" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md p-4 sm:p-6 flex items-center justify-center overflow-y-auto">
+      
+      <div class="max-w-2xl w-full bg-white border-4 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col gap-6 relative overflow-hidden">
+        
+        <div class="absolute -top-24 -right-24 w-60 h-60 bg-amber-100 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header -->
+        <div class="flex items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4 flex-col sm:flex-row">
+          <div class="flex items-center gap-3">
+            <div id="cinematic-icon-box" class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-900 flex items-center justify-center text-2xl font-bold shadow-md shadow-amber-200">
+              <i id="cinematic-icon" class="fa-solid fa-masks-theater"></i>
+            </div>
+            <div>
+              <span id="cinematic-subtitle" class="text-xs font-bold text-amber-600 uppercase tracking-wider">¡Misterio Revelado!</span>
+              <h3 id="cinematic-title" class="font-display font-extrabold text-xl sm:text-2xl text-slate-800">El Enigma Topológico del 4x4</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtitle Narrative Output -->
+        <div class="min-h-[160px] flex flex-col justify-center bg-slate-50 p-5 rounded-2xl border border-slate-200">
+          <p id="cinematic-text" class="text-slate-700 text-sm sm:text-base leading-relaxed font-semibold">
+            <!-- Text dynamically injected -->
+          </p>
+        </div>
+
+        <!-- Interactive Question Section (only used in 4x4) -->
+        <div id="cinematic-quiz" class="hidden flex-col gap-3">
+          <h4 class="font-display font-bold text-sm text-amber-700">
+            ¿Por qué el caballo no puede recorrer todas las casillas del 4x4 sin quedarse atrapado?
+          </h4>
+          <div class="grid grid-cols-1 gap-2 text-xs font-medium">
+            <button onclick="handleQuizAnswer(false)" class="p-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition text-left shadow-sm">
+              A) Porque el caballo se cansa rápido y prefiere tableros más grandes para pastar.
+            </button>
+            <button onclick="handleQuizAnswer(true)" class="p-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition text-left shadow-sm font-bold hover:border-emerald-400">
+              B) Porque las esquinas tienen solo 2 salidas, lo que crea embudos matemáticos que impiden recorrer todo el tablero.
+            </button>
+            <button onclick="handleQuizAnswer(false)" class="p-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 transition text-left shadow-sm">
+              C) Porque falta la Dama para enseñarle el camino correcto y darle paso.
+            </button>
+          </div>
+        </div>
+
+        <!-- Action / Continue Button -->
+        <div class="flex items-center justify-between pt-2">
+          <div class="text-xs text-slate-500 font-medium">
+            Atenea valora tu perseverancia en el <span class="text-amber-600 font-bold">pensamiento computacional</span>.
+          </div>
+          <button id="btn-cinematic-next" class="px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-extrabold text-sm shadow-md shadow-amber-200 transition flex items-center gap-2 border border-amber-500">
+            <span>Siguiente</span> <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // --- APP STATE & METRICS ---
+    const state = {
+      currentView: 'home', 
+      gridSize: 4,         
+      board: [],           
+      visitedPath: [],     
+      attempts4x4: 0,
+      unlocked6x6: false,  
+      unlocked8x8: false,  
+      soundEnabled: true,
+      ttsEnabled: true,
+      showHelpers: true,
+      records: { 4: 0, 6: 0, 8: 0 },
+      activeCinematic: null,
+      cinematicPhase: 0
+    };
+
+    // --- WEB AUDIO API SYNTHESIZER (Sound Effects) ---
+    const sfx = {
+      ctx: new (window.AudioContext || window.webkitAudioContext)(),
+      playTone: function(freq, type, duration, vol) {
+        if (!state.soundEnabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      },
+      playHop: function() { this.playTone(400, 'sine', 0.15, 0.2); setTimeout(() => this.playTone(600, 'sine', 0.15, 0.2), 100); },
+      playError: function() { this.playTone(150, 'sawtooth', 0.3, 0.2); },
+      playDramaticChord: function() { this.playTone(300, 'triangle', 1, 0.3); this.playTone(250, 'triangle', 1, 0.3); },
+      playUndo: function() { this.playTone(500, 'sine', 0.1, 0.1); },
+      playMagic: function() { this.playTone(600, 'sine', 0.1, 0.1); setTimeout(() => this.playTone(800, 'sine', 0.2, 0.1), 100); setTimeout(() => this.playTone(1200, 'sine', 0.4, 0.1), 250); }
+    };
+
+    // --- STRICT ATENEA SPANISH FEMALE VOICE SELECTION ---
+    function getAteneaVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      const esVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
+      if (esVoices.length === 0) return null;
+
+      // Male keywords to explicitly exclude
+      const maleKeywords = ['jorge', 'pablo', 'diego', 'manuel', 'javier', 'david', 'carlos', 'enrique', 'jon', 'gonzalo', 'alvaro', 'álvaro', 'mateo', 'santiago', 'sebastian', 'sebastián', 'raul', 'raúl', 'mario', 'andres', 'andrés', 'miguel', 'juan', 'pedro', 'male'];
+
+      const isMale = (v) => {
+        const name = v.name.toLowerCase();
+        return maleKeywords.some(m => name.includes(m));
+      };
+
+      // Female keywords priority list
+      const femaleKeywords = ['female', 'mujer', 'monica', 'mónica', 'paulina', 'luciana', 'victoria', 'helena', 'conchita', 'sabina', 'laura', 'sofia', 'sofía', 'google español', 'microsoft sabina', 'microsoft helena', 'microsoft laura', 'sora', 'paloma', 'hilda'];
+
+      const femaleVoice = esVoices.find(v => {
+        const name = v.name.toLowerCase();
+        return femaleKeywords.some(f => name.includes(f)) && !isMale(v);
+      });
+
+      if (femaleVoice) return femaleVoice;
+
+      const nonMaleVoice = esVoices.find(v => !isMale(v));
+      if (nonMaleVoice) return nonMaleVoice;
+
+      return esVoices[0];
+    }
+
+    // Variable global para evitar que los clics rápidos saturen el motor
+    let speechTimeoutId = null;
+
+    function speakAtenea(text, isImportant = false) {
+      if (!state.ttsEnabled || !('speechSynthesis' in window)) return;
+      
+      // 1. DEBOUNCING: Limpiamos peticiones de voz encoladas por clics muy rápidos
+      if (speechTimeoutId) {
+        clearTimeout(speechTimeoutId);
+      }
+
+      // 2. HARD RESET: Detener cualquier voz actual y despertar el motor (previene bugs de Chrome)
+      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.resume) {
+        window.speechSynthesis.resume(); // Desatasca el motor si el navegador lo dejó en pausa interna
+      }
+
+      // Solución al bloqueo de audio: pequeña pausa antes de iniciar el nuevo texto.
+      // Damos más tiempo (250ms) si es un mensaje crucial (ej. cinemáticas) para asegurar que el motor respiró.
+      const delay = isImportant ? 250 : 80;
+
+      speechTimeoutId = setTimeout(() => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.88;
+        utterance.pitch = 1.35; // Tono femenino cálido
+        utterance.volume = 1.0; // Volumen al máximo garantizado
+
+        const chosenVoice = getAteneaVoice();
+        if (chosenVoice) {
+          utterance.voice = chosenVoice;
+        }
+
+        window.speechSynthesis.speak(utterance);
+      }, delay);
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    // --- STREAMING_CHUNK:Logic - Knight Movement... ---
+    const KNIGHT_OFFSETS = [
+      { r: -2, c: -1 }, { r: -2, c: 1 },
+      { r: -1, c: -2 }, { r: -1, c: 2 },
+      { r: 1, c: -2 },  { r: 1, c: 2 },
+      { r: 2, c: -1 },  { r: 2, c: 1 }
+    ];
+
+    function isValidSquare(r, c, size) {
+      return r >= 0 && r < size && c >= 0 && c < size;
+    }
+
+    function getValidKnightMoves(r, c, size, board) {
+      const moves = [];
+      for (const off of KNIGHT_OFFSETS) {
+        const nr = r + off.r;
+        const nc = c + off.c;
+        if (isValidSquare(nr, nc, size) && board[nr][nc] === null) {
+          moves.push({ r: nr, c: nc });
+        }
+      }
+      return moves;
+    }
+
+    // --- DOM ELEMENTS ---
+    const viewHome = document.getElementById('view-home');
+    const viewGame = document.getElementById('view-game');
+    const viewCinematic = document.getElementById('view-cinematic');
+    const boardContainer = document.getElementById('board-container');
+
+    const scoreCurrentEl = document.getElementById('score-current');
+    const scoreMaxEl = document.getElementById('score-max');
+    const gameTitleEl = document.getElementById('game-title');
+    const ateneaAdviceEl = document.getElementById('atenea-advice-text');
+    const stuckBanner = document.getElementById('stuck-banner');
+
+    const attemptsInfoBox = document.getElementById('attempts-info-box');
+    const attemptCountVal = document.getElementById('attempt-count-val');
+    const badgeAttempts4 = document.getElementById('badge-attempts-4');
+
+    const btnToggleHints = document.getElementById('btn-toggle-hints');
+    const iconHints = document.getElementById('icon-hints');
+    const textHints = document.getElementById('text-hints');
+
+    // --- STREAMING_CHUNK:Logic - Game Initialization... ---
+    function startLevel(size) {
+      state.gridSize = size;
+      state.board = Array.from({ length: size }, () => Array(size).fill(null));
+      state.visitedPath = [];
+      state.currentView = 'game';
+
+      if (size === 4) {
+        // Display attempts without incrementing here
+        badgeAttempts4.innerText = `Intentos: ${state.attempts4x4}`;
+        attemptCountVal.innerText = state.attempts4x4;
+        attemptsInfoBox.classList.remove('hidden');
+      } else {
+        attemptsInfoBox.classList.add('hidden');
+      }
+
+      gameTitleEl.innerText = `Tablero ${size} x ${size}`;
+      scoreMaxEl.innerText = size * size;
+      scoreCurrentEl.innerText = '0';
+      stuckBanner.classList.add('hidden');
+
+      switchView('game');
+      renderBoardNoFlicker();
+
+      const introMsg = `¡Nivel ${size}x${size}! Elige la casilla inicial donde saltará tu caballo por primera vez.`;
+      updateAteneaAdvice(introMsg);
+    }
+
+    function switchView(target) {
+      state.currentView = target;
+      viewHome.classList.toggle('hidden', target !== 'home');
+      viewGame.classList.toggle('hidden', target !== 'game');
+      viewCinematic.classList.toggle('hidden', target !== 'cinematic');
+    }
+
+    function renderBoardNoFlicker() {
+      const size = state.gridSize;
+      
+      // Strict layout locking the grid to prevent shifting elements.
+      boardContainer.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
+      boardContainer.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
+      boardContainer.className = `relative w-full max-w-[460px] aspect-square rounded-xl shadow-xl overflow-hidden border-4 border-amber-800 bg-amber-50 grid`;
+      
+      boardContainer.innerHTML = '';
+
+      const currentPos = state.visitedPath.length > 0 
+        ? state.visitedPath[state.visitedPath.length - 1] 
+        : null;
+
+      const validMoves = currentPos 
+        ? getValidKnightMoves(currentPos.r, currentPos.c, size, state.board) 
+        : [];
+
+      // Scale text & icon sizes adaptively so content never expands cells
+      let fontSizeClass = 'text-base sm:text-xl';
+      let iconSizeClass = 'text-xl sm:text-2xl';
+      let dotSizeClass = 'w-3.5 h-3.5';
+
+      if (size === 6) {
+        fontSizeClass = 'text-xs sm:text-sm';
+        iconSizeClass = 'text-base sm:text-lg';
+        dotSizeClass = 'w-2.5 h-2.5';
+      } else if (size === 8) {
+        fontSizeClass = 'text-[10px] sm:text-[11px]';
+        iconSizeClass = 'text-sm sm:text-base';
+        dotSizeClass = 'w-2 h-2';
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const squareVal = state.board[r][c];
+          const isLight = (r + c) % 2 === 0;
+
+          const sqDiv = document.createElement('div');
+          sqDiv.dataset.row = r;
+          sqDiv.dataset.col = c;
+          
+          // STRICT cell constraints: aspect-square, w-full, h-full, min-w-0, min-h-0
+          sqDiv.className = `relative aspect-square w-full h-full min-w-0 min-h-0 overflow-hidden flex items-center justify-center font-display font-extrabold ${fontSizeClass} square-transition cursor-pointer select-none border border-black/5`;
+
+          let bgClass = isLight ? 'bg-[#f0d9b5] text-slate-800' : 'bg-[#b58863] text-slate-100';
+
+          const isKnightHere = currentPos && currentPos.r === r && currentPos.c === c;
+          const isValidTarget = validMoves.some(m => m.r === r && m.c === c);
+
+          if (squareVal !== null) {
+            bgClass = isLight ? 'bg-emerald-200 text-emerald-950' : 'bg-emerald-700 text-emerald-50';
+          }
+
+          sqDiv.className += ` ${bgClass}`;
+
+          if (isKnightHere) {
+            sqDiv.className += ' !bg-amber-400 !text-slate-950 ring-2 sm:ring-4 ring-amber-300 ring-inset shadow-lg z-10 animate-pulse-fast';
+            sqDiv.innerHTML = `
+              <div class="flex flex-col items-center justify-center leading-none p-0.5 pointer-events-none w-full h-full">
+                <i class="fa-solid fa-chess-knight ${iconSizeClass} drop-shadow"></i>
+                <span class="${fontSizeClass} font-extrabold mt-0.5 leading-none">${squareVal}</span>
+              </div>
+            `;
+          } else if (isValidTarget) {
+            if (state.showHelpers) {
+              sqDiv.className += ' ring-2 sm:ring-4 ring-emerald-400/80 ring-inset hover:bg-emerald-400/30';
+              sqDiv.innerHTML = `
+                <div class="${dotSizeClass} rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50 animate-ping opacity-75 pointer-events-none"></div>
+              `;
+            } else {
+              sqDiv.className += ' hover:brightness-105';
+            }
+          } else if (squareVal !== null) {
+            sqDiv.innerHTML = `<span class="opacity-90 font-bold leading-none pointer-events-none w-full text-center">${squareVal}</span>`;
+          }
+
+          sqDiv.addEventListener('click', () => handleSquareClick(r, c));
+          boardContainer.appendChild(sqDiv);
+        }
+      }
+
+      const score = state.visitedPath.length;
+      scoreCurrentEl.innerText = score;
+      if (score > state.records[size]) {
+        state.records[size] = score;
+        updateRecordDisplays();
+      }
+
+      if (currentPos && validMoves.length === 0) {
+        handleStuckState();
+      }
+    }
+
+    // --- STREAMING_CHUNK:Logic - Game Mechanics... ---
+    function handleSquareClick(r, c) {
+      const size = state.gridSize;
+
+      if (state.visitedPath.length === 0) {
+        state.board[r][c] = 1;
+        state.visitedPath.push({ r, c });
+        sfx.playHop();
+        renderBoardNoFlicker();
+        updateAteneaAdvice("¡Excelente elección! Ahora realiza tus movimientos en 'L' sin repetir casillas.");
+        return;
+      }
+
+      const currentPos = state.visitedPath[state.visitedPath.length - 1];
+      const validMoves = getValidKnightMoves(currentPos.r, currentPos.c, size, state.board);
+      const isTargetValid = validMoves.some(m => m.r === r && m.c === c);
+
+      if (isTargetValid) {
+        const nextStep = state.visitedPath.length + 1;
+        state.board[r][c] = nextStep;
+        state.visitedPath.push({ r, c });
+        sfx.playHop();
+        renderBoardNoFlicker();
+
+        const encouragement = [
+          `¡Movimiento ${nextStep} realizado! Sigue así.`,
+          `¡Un salto impecable! Ya llevas ${nextStep} movimientos realizados.`,
+          `¡Genial! El caballo trota feliz por el tablero.`,
+          `¡Paso ${nextStep}! Revisa bien tus futuros saltos.`
+        ];
+        const randomMsg = encouragement[Math.floor(Math.random() * encouragement.length)];
+        updateAteneaAdvice(randomMsg);
+
+        if (size === 6 && (nextStep >= 20 || nextStep === 36) && !state.unlocked8x8) {
+          unlockLevel8();
+          updateAteneaAdvice("¡Impresionante! Has demostrado un gran dominio en el 6x6. He desbloqueado el tablero 8x8 para ti.");
+        }
+
+      } else {
+        sfx.playError();
+        if (state.board[r][c] !== null) {
+          updateAteneaAdvice("¡Cuidado! Esa casilla ya la utilizaste. El caballo no puede volver a pisar casillas de movimientos realizados.");
+        } else {
+          updateAteneaAdvice("¡Ese salto no dibuja una 'L'! Recuerda: avanzas 2 casillas en línea recta y luego das 1 giro de 90°.");
+        }
+      }
+    }
+
+    function handleStuckState() {
+      const score = state.visitedPath.length;
+      
+      // Check for WIN condition first
+      if (score === state.gridSize * state.gridSize) {
+        sfx.playMagic();
+        if (state.gridSize === 6) {
+          setTimeout(() => triggerCinematicSequence('6x6_win'), 1200);
+        } else if (state.gridSize === 8) {
+          setTimeout(() => triggerCinematicSequence('8x8_win'), 1200);
+        }
+        return; // Win supersedes "stuck" banner
+      }
+
+      stuckBanner.classList.remove('hidden');
+      sfx.playDramaticChord();
+
+      let msg = `¡Vaya! Te has quedado sin casillas libres a tiro de caballo. Lograste ${score} movimientos realizados. `;
+
+      if (state.gridSize === 4) {
+        // Increment attempt ONLY when player actually gets stuck!
+        state.attempts4x4++;
+        badgeAttempts4.innerText = `Intentos: ${state.attempts4x4}`;
+        attemptCountVal.innerText = state.attempts4x4;
+
+        msg += `Fíjate muy bien en las esquinas del tablero: ¡solo tienen 2 salidas! Esto genera embudos matemáticos. ¡Sigue intentándolo para descubrir el secreto!`;
+        if (state.attempts4x4 >= 5 && !state.unlocked6x6) {
+          setTimeout(() => {
+            triggerCinematicSequence('4x4_fail');
+          }, 4500); 
+        }
+      } else if (state.gridSize === 6) {
+        msg += `¡Buen intento! Puedes usar el botón Deshacer para retroceder o volver al menú principal.`;
+      } else {
+        msg += `¡Excelente intento en el tablero de 64 casillas! Puedes usar Deshacer para buscar otra ruta.`;
+      }
+
+      updateAteneaAdvice(msg);
+    }
+
+    function updateAteneaAdvice(text) {
+      ateneaAdviceEl.innerText = text;
+      speakAtenea(text);
+    }
+
+    function updateRecordDisplays() {
+      document.getElementById('record-4x4').innerText = `${state.records[4]} / 16`;
+      document.getElementById('record-6x6').innerText = `${state.records[6]} / 36`;
+      document.getElementById('record-8x8').innerText = `${state.records[8]} / 64`;
+    }
+
+    function undoLastStep() {
+      if (state.visitedPath.length === 0) return;
+      const lastPos = state.visitedPath.pop();
+      state.board[lastPos.r][lastPos.c] = null;
+      sfx.playUndo();
+      stuckBanner.classList.add('hidden'); // Clear stuck message when undoing
+      renderBoardNoFlicker();
+      updateAteneaAdvice("Has deshecho el último paso. ¿Qué otra ruta probarás?");
+    }
+
+    // --- STREAMING_CHUNK:Logic - Cinematic Dialogues... ---
+    // CINEMATIC DIALOGUES (Pensamiento computacional desenchufado y logros)
+    const DIALOGUES = {
+      '4x4_fail': {
+        title: "El Enigma Topológico del 4x4",
+        subtitle: "¡Misterio Revelado!",
+        icon: "fa-masks-theater",
+        iconBoxClass: "w-12 h-12 rounded-2xl bg-amber-400 text-slate-900 flex items-center justify-center text-2xl font-bold shadow-md shadow-amber-200",
+        steps: [
+          { text: "¡Alto ahí, intrépido navegante del ajedrez! ✋♟️ He estado observando con atención tus intentos en el tablero 4x4...", btnText: "Siguiente" },
+          { text: "Logras sumar bastantes movimientos, pero siempre te quedas sin salidas. Como profesora, quiero enseñarte algo muy especial: ¡a veces, entender por qué un reto es imposible es la mayor victoria matemática y computacional!", btnText: "¿Por qué ocurre esto?" },
+          { text: "¡Llegó el momento del Gran Enigma! ¿Por qué el caballo no puede recorrer todas las casillas del 4x4 sin quedarse atrapado irremediablemente?", showQuiz: true, btnText: "Comprobar respuesta" },
+          { text: "¡Exacto! 🌟 Al saltar en 'L', las esquinas solo tienen dos salidas. El caballo se ve obligado a entrar y salir de ellas cerrando circuitos muy cortos (embudos topológicos) de los que no puede escapar para visitar el resto.", btnText: "¡Qué interesante!" },
+          { text: "Has aplicado un excelente pensamiento computacional. Como recompensa a tu curiosidad, he desbloqueado el Tablero de 6x6. ¡Allí el recorrido completo sí es posible! 🎉", unlocks6x6: true, btnText: "¡Ir al Tablero 6x6!" }
+        ]
+      },
+      '6x6_win': {
+        title: "¡Conquista del 6x6!",
+        subtitle: "Logro Desbloqueado",
+        icon: "fa-medal",
+        iconBoxClass: "w-12 h-12 rounded-2xl bg-indigo-500 text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-indigo-300",
+        steps: [
+          { text: "¡Maravilloso! 🌟 Has conquistado el tablero de 6x6 realizando los 36 saltos del caballo sin repetir ni una sola casilla.", btnText: "Siguiente" },
+          { text: "Has demostrado una excelente visión espacial y memoria algorítmica. Estas virtudes son esenciales para el pensamiento computacional y para ganar minijuegos de ajedrez como los 'Caballos hambrientos'.", btnText: "Volver al Menú Principal", goHome: true }
+        ]
+      },
+      '8x8_win': {
+        title: "El Tablero Real de 64",
+        subtitle: "¡Logro Grandioso!",
+        icon: "fa-trophy",
+        iconBoxClass: "w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-emerald-300",
+        steps: [
+          { text: "¡Excepcional! 🏆 Has logrado una de las proezas matemáticas más antiguas y fascinantes: el recorrido completo del caballo por las 64 casillas.", btnText: "Siguiente" },
+          { text: "Tu constancia y capacidad para resolver problemas te han llevado a la victoria. ¡Ya estás preparado/a para ser docente en tu Comunidad de Aprendizaje! ¡Enhorabuena, Gran Maestra/o!", btnText: "Volver al Menú Principal", goHome: true }
+        ]
+      }
+    };
+
+    function triggerCinematicSequence(type) {
+      state.activeCinematic = type;
+      state.cinematicPhase = 0;
+      
+      const config = DIALOGUES[type];
+      document.getElementById('cinematic-title').innerText = config.title;
+      document.getElementById('cinematic-subtitle').innerText = config.subtitle;
+      document.getElementById('cinematic-icon').className = `fa-solid ${config.icon}`;
+      document.getElementById('cinematic-icon-box').className = config.iconBoxClass;
+
+      switchView('cinematic');
+      renderCinematicPhase();
+    }
+
+    function renderCinematicPhase() {
+      const activeData = DIALOGUES[state.activeCinematic];
+      const current = activeData.steps[state.cinematicPhase];
+      
+      const textEl = document.getElementById('cinematic-text');
+      const btnNext = document.getElementById('btn-cinematic-next');
+      const quizEl = document.getElementById('cinematic-quiz');
+
+      textEl.innerText = current.text;
+
+      btnNext.querySelector('span').innerText = current.btnText || "Siguiente";
+      
+      // Store flag if this is the final home step
+      btnNext.dataset.goHome = current.goHome ? "true" : "false";
+
+      if (current.showQuiz) {
+        quizEl.classList.remove('hidden');
+        btnNext.classList.add('hidden');
+      } else {
+        quizEl.classList.add('hidden');
+        btnNext.classList.remove('hidden');
+      }
+
+      if (current.unlocks6x6) {
+        unlockLevel6();
+      }
+    }
+
+    // --- STREAMING_CHUNK:Logic - Unlocks & Events... ---
+    function unlockLevel6() {
+      state.unlocked6x6 = true;
+      const card6 = document.getElementById('card-level-6');
+      const btn6 = document.getElementById('btn-play-6');
+      const lock6 = document.getElementById('lock-icon-6');
+      card6.classList.remove('opacity-70', 'bg-slate-50');
+      card6.classList.add('bg-white', 'border-indigo-400', 'hover:border-indigo-500', 'cursor-pointer', 'shadow-sm', 'hover:shadow-md');
+      lock6.className = 'text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200';
+      lock6.innerHTML = '<i class="fa-solid fa-lock-open"></i> Desbloqueado';
+      btn6.disabled = false;
+      btn6.className = 'px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer';
+      btn6.innerText = '¡Jugar 6x6!';
+      card6.onclick = () => startLevel(6);
+    }
+
+    function unlockLevel8() {
+      state.unlocked8x8 = true;
+      const card8 = document.getElementById('card-level-8');
+      const btn8 = document.getElementById('btn-play-8');
+      const lock8 = document.getElementById('lock-icon-8');
+      card8.classList.remove('opacity-70', 'bg-slate-50');
+      card8.classList.add('bg-white', 'border-emerald-400', 'hover:border-emerald-500', 'cursor-pointer', 'shadow-sm', 'hover:shadow-md');
+      lock8.className = 'text-xs text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200';
+      lock8.innerHTML = '<i class="fa-solid fa-lock-open"></i> Desbloqueado';
+      btn8.disabled = false;
+      btn8.className = 'px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5 cursor-pointer';
+      btn8.innerText = '¡Jugar 8x8!';
+      card8.onclick = () => startLevel(8);
+    }
+
+    document.getElementById('btn-back-menu').addEventListener('click', () => {
+      switchView('home');
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+      speakAtenea("Has vuelto al Menú Principal. Tus intentos acumulados están guardados.");
+    });
+
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      startLevel(state.gridSize);
+      updateAteneaAdvice("Has reiniciado el tablero. ¡Prueba una casilla de salida distinta!");
+    });
+
+    document.getElementById('btn-undo').addEventListener('click', undoLastStep);
+
+    document.getElementById('btn-repeat-speech').addEventListener('click', () => {
+      speakAtenea(ateneaAdviceEl.innerText);
+    });
+
+    // Toggle Visual Helpers Button
+    btnToggleHints.addEventListener('click', () => {
+      state.showHelpers = !state.showHelpers;
+      if (state.showHelpers) {
+        iconHints.className = 'fa-solid fa-eye text-emerald-600';
+        textHints.innerText = 'Ayudas: SÍ';
+        btnToggleHints.className = 'p-2.5 sm:p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 transition flex items-center gap-1.5 text-xs font-bold border border-emerald-300 shadow-sm';
+      } else {
+        iconHints.className = 'fa-solid fa-eye-slash text-slate-400';
+        textHints.innerText = 'Ayudas: NO';
+        btnToggleHints.className = 'p-2.5 sm:p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center gap-1.5 text-xs font-bold border border-slate-300 shadow-sm';
+      }
+      renderBoardNoFlicker();
+    });
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', function() {
+      state.soundEnabled = !state.soundEnabled;
+      const icon = document.getElementById('icon-sound');
+      icon.className = state.soundEnabled ? 'fa-solid fa-volume-high text-amber-500' : 'fa-solid fa-volume-xmark text-slate-400';
+    });
+
+    document.getElementById('btn-tts-toggle').addEventListener('click', function() {
+      state.ttsEnabled = !state.ttsEnabled;
+      const icon = document.getElementById('icon-tts');
+      icon.className = state.ttsEnabled ? 'fa-solid fa-comment-dots text-emerald-600' : 'fa-solid fa-comment-slash text-slate-400';
+      if (!state.ttsEnabled && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    });
+
+    // Fullscreen Controls
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen();
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    function updateFullscreenIcons() {
+      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      const icons = document.querySelectorAll('.icon-fullscreen');
+      icons.forEach(icon => {
+        icon.className = isFS 
+          ? 'fa-solid fa-compress text-amber-500 icon-fullscreen' 
+          : 'fa-solid fa-expand icon-fullscreen';
+      });
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcons);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcons);
+    document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
+
+    // Initial event bindings
+    document.getElementById('btn-cinematic-next').addEventListener('click', function() {
+      const activeData = DIALOGUES[state.activeCinematic];
+      
+      // If the current step triggers a return to home
+      if (this.dataset.goHome === "true") {
+        switchView('home');
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        return;
+      }
+
+      state.cinematicPhase++;
+      if (state.cinematicPhase < activeData.steps.length) {
+        renderCinematicPhase();
+      } else {
+        switchView('home');
+      }
+    });
+
+    document.getElementById('card-level-4').addEventListener('click', () => startLevel(4));
+
+    document.getElementById('btn-play-intro').addEventListener('click', () => {
+      speakAtenea("¡Hola, explorador del tablero! Soy la profesora Atenea. Hoy vamos a desarrollar nuestro pensamiento computacional investigando el movimiento más mágico y divertido de todo el ajedrez: El Salto en ele del Caballo. Tu misión es realizar la mayor cantidad de movimientos posibles sin repetir ninguna casilla. ¡Adelante!");
+    });
+
+    window.handleQuizAnswer = function(isCorrect) {
+      if (isCorrect) {
+        sfx.playHop();
+        state.cinematicPhase++;
+        renderCinematicPhase();
+      } else {
+        sfx.playError();
+        speakAtenea("Casi, pero no es la respuesta correcta. Piensa en la forma de las esquinas del tablero de 4x4 y en cuántas salidas tienen (los embudos matemáticos). ¡Inténtalo de nuevo!");
+      }
+    };
+
+  </script>
+</body>
+</html>
+
